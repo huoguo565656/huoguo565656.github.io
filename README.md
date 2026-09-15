@@ -12,7 +12,7 @@
 | 我想…… | 怎么做 |
 |---|---|
 | **改个错别字** | 打开 GitHub 网页，进 `content/posts/` 找到那个文件，点铅笔图标改，Commit。约 40 秒后生效 |
-| **写新文章** | `./scripts/new-post.sh "文章标题"` → 写内容 → `./scripts/publish.sh "post: 标题"` |
+| **写新文章** | `./scripts/new-post.sh "文章标题" --slug my-post` → 写内容 → `./scripts/publish.sh "post: 标题"` |
 | **本地看效果** | 本机装好 Hugo 后跑 `./scripts/preview.sh`，浏览器开 http://localhost:1313/ |
 | **改站名/导航/作者** | 只改 `hugo.toml`，详见下面的「常用配置位置」 |
 | **改主题样式** | 改 `themes/PaperMod/` 里的文件；升级主题见「主题升级」 |
@@ -25,9 +25,9 @@
 .
 ├── hugo.toml                      # ★ 全站配置：站名、作者、导航、主题参数
 ├── content/
-│   ├── posts/                     # ★ 文章都放这里
+│   ├── posts/                     # ★ 文章都放这里（文件名=网址，用英文短横线）
 │   │   ├── _index.md              #   文章列表页的标题
-│   │   └── YYYY-MM-DD-标题.md
+│   │   └── my-post-slug.md        #   → 网址 /posts/my-post-slug/
 │   ├── about.md                   # 关于页
 │   ├── archives.md                # 归档页（layout: archives）
 │   ├── search.md                  # 搜索页（layout: search）
