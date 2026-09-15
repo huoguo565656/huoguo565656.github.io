@@ -1,0 +1,120 @@
+# =========================================================
+#  博客站点配置（Hugo + PaperMod）
+#  ⚠️ 想改站名/作者/描述，只动这一段的 title / author / description 就行
+# =========================================================
+baseURL      = "https://huoguo565656.github.io/"
+title        = "技术笔记"
+author       = "huoguo565656"
+description  = "多无人机空域调度方向的技术笔记：论文复现、建模推导、工程实现与踩坑记录。"
+locale       = "zh-cn"
+defaultContentLanguage = "zh-cn"
+theme        = "PaperMod"
+enableRobotsTXT = true
+paginate     = 10
+enableEmoji  = true
+
+# 默认不构建草稿和未来时间的文章；写草稿时 frontmatter 里写 draft: true
+buildDrafts  = false
+buildFuture  = false
+buildExpired = false
+
+# ------------------------------------------------------------------
+#  主题参数
+# ------------------------------------------------------------------
+[params]
+  env             = "production"
+  defaultTheme    = "auto"          # 跟随系统；读者可点导航栏切换明暗
+  # 日期格式。不设的话用主题默认的 :date_long，中文站会渲染成 "September 15, 2026"
+  DateFormat      = "2006 年 1 月 2 日"
+  ShowReadingTime = true
+  ShowWordCount   = true
+  ShowShareButtons = true
+  ShowPostNavLinks = true
+  ShowBreadCrumbs  = true
+  ShowCodeCopyButtons = true
+  ShowRssButtonInSectionTermList = true
+  UseHugoToc      = true
+  hideFooter      = false
+  disableSpecial1stPost = false
+  disableScrollToTop    = false
+  hidemeta        = false
+  hideSummary     = false
+  showtoc         = true            # 文章内默认显示目录
+  tocopen         = false           # 目录默认折叠
+  comments        = false           # 暂时不接评论系统
+
+  # 首页顶部那块自我介绍
+  [params.homeInfoParams]
+    Title   = "你好，欢迎翻我的笔记"
+    Content = """
+这里放**技术笔记**，不是资讯搬运站。
+
+主要写四类东西：
+
+- **论文复现** —— 复现到哪一步、差在哪、为什么
+- **建模推导** —— 公式怎么来的，假设在哪一步被用掉
+- **工程实现** —— 环境、数据、脚本，能跑的代码
+- **踩坑记录** —— 尤其是那种不记下来下次还会踩的
+
+所有涉及文献的地方标年份和出处；没核实的一律写明「待复核」，不编。
+"""
+
+  # 没有头像图片时留空即可；有图就放到 static/ 下再填路径
+  [params.assets]
+    disableHLJS = true              # 用 Hugo 内置高亮，不引外部 JS
+    favicon     = "/favicon.ico"
+
+  # 导航栏右侧的图标。要加就再复制一段 [[params.socialIcons]]
+  [[params.socialIcons]]
+    name = "github"
+    url  = "https://github.com/huoguo565656"
+  [[params.socialIcons]]
+    name = "rss"
+    url  = "index.xml"
+
+# ------------------------------------------------------------------
+#  导航栏
+# ------------------------------------------------------------------
+[[menu.main]]
+  identifier = "posts"
+  name       = "文章"
+  url        = "posts/"
+  weight     = 10
+[[menu.main]]
+  identifier = "archives"
+  name       = "归档"
+  url        = "archives/"
+  weight     = 20
+[[menu.main]]
+  identifier = "tags"
+  name       = "标签"
+  url        = "tags/"
+  weight     = 30
+[[menu.main]]
+  identifier = "search"
+  name       = "搜索"
+  url        = "search/"
+  weight     = 40
+[[menu.main]]
+  identifier = "about"
+  name       = "关于"
+  url        = "about/"
+  weight     = 50
+
+# ------------------------------------------------------------------
+#  Markdown / 代码高亮
+# ------------------------------------------------------------------
+[markup]
+  [markup.goldmark.renderer]
+    unsafe = true                   # 允许正文里写原生 HTML（表格、折叠块用得上）
+  [markup.highlight]
+    codeFences  = true
+    guessSyntax = true
+    lineNos     = false
+    noClasses   = false
+    style       = "github"          # 明色主题下的代码配色
+
+# 首页额外输出 JSON，给站内搜索用（content/search.md 依赖它）
+# PaperMod 的搜索读的就是根目录的 index.json，不用自定义 output format
+[outputs]
+  home = ["HTML", "RSS", "JSON"]

@@ -1,0 +1,69 @@
+# =========================================================
+#  提交到 main 分支 → 自动构建 Hugo → 发布到 GitHub Pages
+#  仓库 Settings → Pages → Source 必须选 "GitHub Actions"
+# =========================================================
+name: 构建并发布博客
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:        # 也可以在 Actions 页面手动触发
+
+# 这三样缺一不可；少了 id-token: write，deploy 那步会认证失败且报错很隐晦
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# 连续提交时排队部署，不并发（并发会让 Pages 部署互相覆盖）
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      HUGO_VERSION: 0.166.0        # 必须 >= 0.146，PaperMod 的硬要求
+    steps:
+      - name: 检出仓库
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0           # 完整历史，以后要用 enableGitInfo 才拿得到提交时间
+
+      - name: 安装 Hugo
+        run: |
+          wget -q -O "${{ runner.temp }}/hugo.deb" \
+            "https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_extended_${HUGO_VERSION}_linux-amd64.deb"
+          sudo dpkg -i "${{ runner.temp }}/hugo.deb"
+          hugo version
+
+      - name: 配置 Pages
+        id: pages
+        uses: actions/configure-pages@v5
+
+      - name: 构建站点
+        run: |
+          hugo --minify --gc --baseURL "${{ steps.pages.outputs.base_url }}/"
+          echo "构建产物："
+          du -sh public
+
+      - name: 上传产物
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./public
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: 部署到 Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
