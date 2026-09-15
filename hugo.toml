@@ -111,8 +111,12 @@ buildExpired = false
     codeFences  = true
     guessSyntax = true
     lineNos     = false
-    noClasses   = false
-    style       = "github"          # 明色主题下的代码配色
+    noClasses   = false             # PaperMod 要求 false：代码块要输出 class 给它自带的样式表用
+    # ⚠️ 下面这个 style 对 PaperMod **不生效**，改它不会换代码配色。
+    # PaperMod 不拿它去生成 CSS，而是直接用自带的
+    #   themes/PaperMod/assets/css/includes/chroma-styles.css（深底 Catppuccin 配色）
+    # 想换代码高亮配色，改那个文件。深底在明暗两种主题下都保持深底，是主题有意为之。
+    style       = "github"
 
 # 首页额外输出 JSON，给站内搜索用（content/search.md 依赖它）
 # PaperMod 的搜索读的就是根目录的 index.json，不用自定义 output format
