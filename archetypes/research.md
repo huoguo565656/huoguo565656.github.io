@@ -3,8 +3,8 @@ title: "{{ replace .File.ContentBaseName "-" " " | title }}"
 date: {{ .Date }}
 draft: true
 author: "huoguo565656"
-tags: ["论文复现"]
-categories: ["论文复现"]
+tags: ["复现"]
+categories: ["工程"]
 description: ""
 summary: ""
 showToc: true

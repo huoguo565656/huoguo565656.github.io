@@ -1,11 +1,10 @@
 # =========================================================
 #  博客站点配置（Hugo + PaperMod）
-#  ⚠️ 想改站名/作者/描述，只动这一段的 title / author / description 就行
+#  ⚠️ 想改站名/作者/描述，只动这一段 + 下面 [params] 里的 description
 # =========================================================
 baseURL      = "https://huoguo565656.github.io/"
 title        = "技术笔记"
 author       = "huoguo565656"
-description  = "多无人机空域调度方向的技术笔记：论文复现、建模推导、工程实现与踩坑记录。"
 locale       = "zh-cn"
 defaultContentLanguage = "zh-cn"
 theme        = "PaperMod"
@@ -24,6 +23,12 @@ buildExpired = false
 [params]
   env             = "production"
   defaultTheme    = "auto"          # 跟随系统；读者可点导航栏切换明暗
+
+  # ⚠️ 站点描述必须写在这里，不能写在文件顶部。
+  # 顶层的 description 会被 Hugo 当成「语言级配置」（等同 [languages.zh-cn] description），
+  # 不会进 site.Params；而 PaperMod 的 head.html 与 schema_json.html 读的都是
+  # site.Params.description —— 写错位置的结果是 <meta name="description"> 静默变成空。
+  description     = "用 Agent 做小工具的记录：把一个念头做成能跑的东西，写清思路、实现和踩过的坑。"
 
   # ---- 站内编辑器跳转 GitHub 用 ----
   # 在文章页进入「创造模式」后，点「去 GitHub 发布」会打开
@@ -56,16 +61,16 @@ buildExpired = false
   [params.homeInfoParams]
     Title   = "你好，欢迎翻我的笔记"
     Content = """
-这里放**技术笔记**，不是资讯搬运站。
+这里放**用 Agent 做小工具**的记录，不是资讯搬运站。
 
-主要写四类东西：
+基本上每一篇都是一个「原来还能这么干」的念头，然后把它做成能跑的东西：
 
-- **论文复现** —— 复现到哪一步、差在哪、为什么
-- **建模推导** —— 公式怎么来的，假设在哪一步被用掉
-- **工程实现** —— 环境、数据、脚本，能跑的代码
-- **踩坑记录** —— 尤其是那种不记下来下次还会踩的
+- **小巧思** —— 想到什么、为什么觉得可行、边界在哪
+- **怎么实现的** —— 提示词、脚本、代码，能直接抄的
+- **踩过的坑** —— 尤其是那种不记下来下次还会踩的
 
-所有涉及文献的地方标年份和出处；没核实的一律写明「待复核」，不编。
+坦白讲，这里面不少功能，我以前觉得**以我的水平是做不出来的**。做出来了就攒在这儿，
+接着往那些以前不敢想的方向试。
 """
 
   # 没有头像图片时留空即可；有图就放到 static/ 下再填路径
