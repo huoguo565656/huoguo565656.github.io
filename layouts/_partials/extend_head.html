@@ -1,0 +1,48 @@
+{{- /* =========================================================
+       自定义增强 · head 注入
+       这个文件会覆盖主题同名的 partial（主题自带的是空壳），
+       好处：**不用改 themes/PaperMod 里的任何文件**，
+             以后整体替换主题目录升级即可，自定义内容不受影响。
+
+       做两件事：
+         1. 引入自定义样式
+         2. 把前端需要的配置以 JSON 形式吐给 JS
+            （用 <script type="application/json"> 而不是内联 JS，
+              这样不用 inline script，CSP 更友好，也不会被执行）
+       ========================================================= */ -}}
+
+{{- $css := resources.Get "css/custom.css" -}}
+{{- if $css -}}
+  {{- $css = $css | minify | fingerprint -}}
+  <link rel="stylesheet" href="{{ $css.RelPermalink }}" integrity="{{ $css.Data.Integrity }}" crossorigin="anonymous">
+{{- else -}}
+  {{- warnf "custom.css 没找到，检查 assets/css/custom.css 是否存在" -}}
+{{- end -}}
+
+{{- /* Fuse.js 单独 fingerprint 出 URL，交给前端在首次搜索时懒加载，
+       避免每个页面都白下 15KB。主题的 assets/js/fuse.basic.min.js 会被合并进项目资源空间。 */ -}}
+{{- $fuse := resources.Get "js/fuse.basic.min.js" -}}
+{{- $fuseUrl := "" -}}
+{{- if $fuse -}}
+  {{- $fuseUrl = ($fuse | fingerprint).RelPermalink -}}
+{{- else -}}
+  {{- warnf "fuse.basic.min.js 没找到，站内搜索会不可用" -}}
+{{- end -}}
+
+{{- /* 当前页对应的源文件路径（只有文章/页面类才有），用于「编辑本文」 */ -}}
+{{- $srcPath := "" -}}
+{{- with .File -}}{{- $srcPath = .Path -}}{{- end -}}
+
+{{- /* 配置用 data-* 属性传给前端。
+       ⚠️ 这里刻意**不**用 <script type="application/json">：
+       Go 的 html/template 会把 <script> 里的内容再当 JS 转义一遍，
+       于是 {{ jsonify }} 的结果被二次编码成 "{\"a\":1}"，
+       前端 JSON.parse 拿到的是字符串而不是对象。
+       data-* 属性在 attribute 上下文里正常转义，读出来就是原值，没有这个坑。 */ -}}
+<meta id="blog-config"
+      data-index="{{ "index.json" | relURL }}"
+      data-fuse="{{ $fuseUrl }}"
+      data-repo="{{ site.Params.repo | default "" }}"
+      data-branch="{{ site.Params.repoBranch | default "main" }}"
+      data-src-path="{{ $srcPath }}"
+      data-title="{{ .Title }}">

@@ -1,0 +1,18 @@
+{{- /* =========================================================
+       自定义增强 · footer 注入
+       同样覆盖主题的空壳 partial，不改主题文件。
+
+       只做一件事：引入自定义脚本。
+       搜索框、创造模式、站内编辑器全部在这个脚本里动态创建 DOM，
+       所以主题模板一个字节都不用动。
+
+       用 defer：解析完 DOM 才执行，不阻塞首屏渲染。
+       ========================================================= */ -}}
+
+{{- $js := resources.Get "js/blog-custom.js" -}}
+{{- if $js -}}
+  {{- $js = $js | minify | fingerprint -}}
+  <script defer src="{{ $js.RelPermalink }}" integrity="{{ $js.Data.Integrity }}" crossorigin="anonymous"></script>
+{{- else -}}
+  {{- warnf "blog-custom.js 没找到，检查 assets/js/blog-custom.js 是否存在" -}}
+{{- end -}}

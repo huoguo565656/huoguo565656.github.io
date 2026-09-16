@@ -1,0 +1,600 @@
+/* =========================================================
+   博客自定义增强 —— 样式
+   全部通过 layouts/_partials/extend_head.html 注入，
+   **不修改主题文件**，所以 themes/PaperMod 可以整体升级。
+
+   包含三块：
+     1. 导航栏搜索框 + 结果下拉
+     2. 创造模式：右上角「+」按钮与设置面板（换壁纸 / 调亮度磨砂）
+     3. 站内文章编辑器
+   ========================================================= */
+
+/* =========================================================
+   1. 导航栏搜索框
+   ========================================================= */
+
+.nav-search {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.nav-search-box {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 10px;
+  height: 32px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--entry);
+  transition: border-color .2s ease, box-shadow .2s ease;
+}
+
+.nav-search-box:focus-within {
+  border-color: var(--secondary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--secondary) 18%, transparent);
+}
+
+.nav-search-box svg {
+  width: 15px;
+  height: 15px;
+  flex: none;
+  color: var(--secondary);
+  opacity: .8;
+}
+
+.nav-search input {
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--primary);
+  font-size: 14px;
+  font-family: inherit;
+  width: 132px;
+  padding: 0;
+  transition: width .22s cubic-bezier(.2,.7,.2,1);
+}
+
+.nav-search input:focus { width: 190px; }
+
+.nav-search input::placeholder { color: var(--secondary); opacity: .75; }
+
+/* 清空按钮 */
+.nav-search-clear {
+  border: 0;
+  background: transparent;
+  color: var(--secondary);
+  cursor: pointer;
+  font-size: 15px;
+  line-height: 1;
+  padding: 2px 0 2px 2px;
+  display: none;
+}
+.nav-search-box.has-value .nav-search-clear { display: block; }
+.nav-search-clear:hover { color: var(--primary); }
+
+/* 键盘提示（桌面端才显示） */
+.nav-search-kbd {
+  font-size: 11px;
+  color: var(--secondary);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0 4px;
+  line-height: 16px;
+  flex: none;
+}
+.nav-search-box:focus-within .nav-search-kbd { display: none; }
+
+@media screen and (max-width: 768px) {
+  .nav-search-kbd { display: none; }
+  .nav-search input { width: 104px; }
+  .nav-search input:focus { width: 132px; }
+}
+
+/* ---- 结果下拉 ---- */
+.nav-search-results {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  width: min(460px, calc(100vw - 28px));
+  max-height: min(60vh, 440px);
+  overflow-y: auto;
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+  background: var(--entry);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 12px 34px rgba(0, 0, 0, .16);
+  z-index: 60;
+  display: none;
+}
+.nav-search-results.is-open { display: block; animation: nsDrop .18s cubic-bezier(.2,.7,.2,1); }
+@keyframes nsDrop {
+  from { opacity: 0; transform: translateY(-5px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.nav-search-results li { list-style: none; }
+
+.nav-search-results a {
+  display: block;
+  padding: 8px 10px;
+  border-radius: calc(var(--radius) - 2px);
+  text-decoration: none;
+  line-height: 1.45;
+}
+.nav-search-results a:hover,
+.nav-search-results a.is-active { background: var(--code-bg); }
+
+.nsr-title {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--primary);
+}
+.nsr-title mark { background: transparent; color: var(--secondary); text-decoration: underline; }
+
+.nsr-snippet {
+  display: block;
+  font-size: 12.5px;
+  color: var(--secondary);
+  margin-top: 2px;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+.nsr-snippet mark { background: color-mix(in srgb, var(--secondary) 26%, transparent); color: inherit; }
+
+.nsr-meta {
+  display: block;
+  font-size: 11.5px;
+  color: var(--secondary);
+  opacity: .85;
+  margin-top: 3px;
+}
+
+.nav-search-empty {
+  padding: 14px 10px;
+  text-align: center;
+  font-size: 13.5px;
+  color: var(--secondary);
+}
+
+/* 搜索结果高亮时，页面滚动定位到目标块的短暂提示 */
+mark.nsr-flash {
+  background: color-mix(in srgb, #f5c542 55%, transparent);
+  border-radius: 3px;
+  animation: nsrFlash 2.4s ease-out forwards;
+}
+@keyframes nsrFlash {
+  0%, 60% { background: color-mix(in srgb, #f5c542 55%, transparent); }
+  100%    { background: transparent; }
+}
+
+/* =========================================================
+   2. 创造模式
+   ========================================================= */
+
+/* ---- 右上角「+」按钮 ---- */
+#creation-fab {
+  position: fixed;
+  top: calc(var(--header-height) + 10px);
+  right: 18px;
+  z-index: 70;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 50%;
+  cursor: pointer;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  background: var(--primary);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, .24);
+  /* 渐进式出场：缩放 + 淡入 + 轻微旋转 */
+  opacity: 0;
+  transform: scale(.3) rotate(-90deg);
+  transition: opacity .38s cubic-bezier(.2,.7,.2,1),
+              transform .48s cubic-bezier(.34,1.45,.5,1),
+              box-shadow .2s ease;
+}
+#creation-fab svg { width: 20px; height: 20px; transition: transform .34s cubic-bezier(.34,1.45,.5,1); }
+#creation-fab.is-visible { display: flex; opacity: 1; transform: scale(1) rotate(0deg); }
+#creation-fab:hover { transform: scale(1.08) rotate(0deg); box-shadow: 0 10px 28px rgba(0,0,0,.3); }
+#creation-fab.is-open svg { transform: rotate(135deg); }   /* 「+」转成「×」 */
+
+/* 面板展开时把按钮推到面板左侧，别互相盖住。
+   这里用独立的 translate 属性而不是 transform —— transform 已经被出场动画占了，
+   两者写在一起会互相覆盖。 */
+#creation-fab { translate: 0 0; transition-property: opacity, transform, box-shadow, translate; }
+@media screen and (min-width: 769px) {
+  #creation-fab.is-open { translate: calc(-1 * (min(360px, 92vw) + 6px)) 0; }
+}
+
+/* 出场时按钮外扩一圈波纹，提示"这里多了个东西" */
+#creation-fab::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid var(--primary);
+  opacity: 0;
+  pointer-events: none;
+}
+#creation-fab.is-visible::after { animation: fabRipple 1.1s ease-out .25s 1; }
+@keyframes fabRipple {
+  0%   { opacity: .55; transform: scale(1); }
+  100% { opacity: 0;   transform: scale(1.9); }
+}
+
+/* ---- 设置面板（从右侧滑入）---- */
+#creation-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  z-index: 69;
+  width: min(360px, 92vw);
+  height: 100%;
+  overflow-y: auto;
+  padding: 20px 22px 26px;
+  background: var(--entry);
+  border-left: 1px solid var(--border);
+  box-shadow: -14px 0 40px rgba(0, 0, 0, .16);
+  transform: translateX(102%);
+  transition: transform .34s cubic-bezier(.22,.7,.25,1), visibility .34s;
+  visibility: hidden;
+}
+#creation-panel.is-open { transform: none; visibility: visible; }
+
+/* 面板内容的「渐进式」入场：逐项错开淡入 */
+#creation-panel > * { opacity: 0; transform: translateY(10px); }
+#creation-panel.is-open > * {
+  animation: cpItemIn .42s cubic-bezier(.2,.7,.2,1) forwards;
+}
+#creation-panel.is-open > *:nth-child(1) { animation-delay: .06s; }
+#creation-panel.is-open > *:nth-child(2) { animation-delay: .12s; }
+#creation-panel.is-open > *:nth-child(3) { animation-delay: .18s; }
+#creation-panel.is-open > *:nth-child(4) { animation-delay: .24s; }
+#creation-panel.is-open > *:nth-child(5) { animation-delay: .30s; }
+#creation-panel.is-open > *:nth-child(6) { animation-delay: .36s; }
+@keyframes cpItemIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.cp-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+.cp-head h2 {
+  font-size: 17px;
+  margin: 0;
+  color: var(--primary);
+}
+.cp-close {
+  border: 0;
+  background: transparent;
+  color: var(--secondary);
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+.cp-close:hover { background: var(--code-bg); color: var(--primary); }
+
+.cp-hint {
+  font-size: 12.5px;
+  color: var(--secondary);
+  margin: 0 0 14px;
+  line-height: 1.6;
+}
+
+.cp-section {
+  border-top: 1px solid var(--border);
+  padding-top: 14px;
+  margin-top: 14px;
+}
+.cp-section > h3 {
+  font-size: 13px;
+  letter-spacing: .06em;
+  color: var(--secondary);
+  margin: 0 0 10px;
+  font-weight: 600;
+}
+
+.cp-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.cp-row label {
+  font-size: 13.5px;
+  color: var(--primary);
+  flex: none;
+  width: 52px;
+}
+.cp-row input[type="range"] {
+  flex: 1;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+.cp-row .cp-val {
+  font-size: 12.5px;
+  color: var(--secondary);
+  width: 42px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.cp-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 14px;
+  font-size: 13.5px;
+  font-family: inherit;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--code-bg);
+  color: var(--primary);
+  cursor: pointer;
+  transition: transform .16s ease, box-shadow .16s ease, opacity .16s ease;
+}
+.cp-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,.1); }
+.cp-btn:active { transform: none; }
+.cp-btn.primary {
+  background: var(--primary);
+  color: var(--theme);
+  border-color: var(--primary);
+}
+.cp-btn.block { width: 100%; }
+.cp-btn.ghost { background: transparent; }
+.cp-btn[disabled] { opacity: .5; cursor: not-allowed; transform: none; }
+
+.cp-btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* 壁纸拖放区 */
+.cp-drop {
+  border: 1.5px dashed var(--border);
+  border-radius: var(--radius);
+  padding: 16px 12px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--secondary);
+  cursor: pointer;
+  transition: border-color .2s ease, background .2s ease;
+}
+.cp-drop:hover,
+.cp-drop.is-over { border-color: var(--secondary); background: var(--code-bg); color: var(--primary); }
+.cp-drop small { display: block; margin-top: 4px; opacity: .8; font-size: 11.5px; }
+
+/* 缩略图预览 */
+.cp-thumb {
+  width: 100%;
+  height: 96px;
+  object-fit: cover;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  margin-bottom: 10px;
+  background: var(--code-bg);
+  display: none;
+}
+.cp-thumb.is-on { display: block; }
+
+.cp-url-row { display: flex; gap: 8px; }
+.cp-url-row input[type="text"] {
+  flex: 1;
+  min-width: 0;
+  padding: 8px 10px;
+  font-size: 13px;
+  font-family: inherit;
+  color: var(--primary);
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  outline: 0;
+}
+.cp-url-row input[type="text"]:focus { border-color: var(--secondary); }
+
+.cp-note {
+  font-size: 11.5px;
+  color: var(--secondary);
+  line-height: 1.6;
+  margin: 8px 0 0;
+}
+
+/* =========================================================
+   3. 壁纸（铺在 body 之下，内容套磨砂卡片）
+   ========================================================= */
+
+/* 壁纸层：固定在最底下。用 ::before 就不用往 DOM 里塞元素 */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-image: var(--wp-image, none);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  filter: brightness(var(--wp-brightness, 1));
+  transition: filter .25s ease, opacity .35s ease;
+  opacity: 0;
+  pointer-events: none;
+}
+html[data-wallpaper] body::before { opacity: 1; }
+
+/* 有壁纸时 body 自身透明，让壁纸透上来 */
+html[data-wallpaper] body { background: transparent; }
+
+/* 内容套一层半透明磨砂卡片，保证文字可读 */
+html[data-wallpaper] .header {
+  background: rgba(255, 255, 255, .74);
+  backdrop-filter: blur(var(--wp-blur, 12px));
+  -webkit-backdrop-filter: blur(var(--wp-blur, 12px));
+}
+html[data-wallpaper] .main {
+  background: rgba(255, 255, 255, .74);
+  backdrop-filter: blur(var(--wp-blur, 12px));
+  -webkit-backdrop-filter: blur(var(--wp-blur, 12px));
+  border-radius: 14px;
+  box-shadow: 0 10px 44px rgba(0, 0, 0, .15);
+  margin-top: var(--gap);
+  margin-bottom: var(--gap);
+}
+
+/* 暗色主题下卡片改用深色底 */
+html[data-wallpaper][data-theme="dark"] .header,
+html[data-wallpaper][data-theme="dark"] .main {
+  background: rgba(29, 30, 32, .74);
+}
+
+/* 支持 color-mix 的浏览器用主题变量算，跟主题切换完全同步 */
+@supports (background: color-mix(in srgb, red 50%, transparent)) {
+  html[data-wallpaper] .header,
+  html[data-wallpaper] .main {
+    background: color-mix(in srgb, var(--theme) 76%, transparent);
+  }
+}
+
+/* 磨砂调到 0 时，把卡片做实一点，否则文字会糊在图上 */
+html[data-wallpaper][data-wp-blur="0"] .header,
+html[data-wallpaper][data-wp-blur="0"] .main {
+  background: color-mix(in srgb, var(--theme) 92%, transparent);
+}
+
+/* 搜索结果、面板这些浮层在有壁纸时也要够实 */
+html[data-wallpaper] .nav-search-results,
+html[data-wallpaper] #creation-panel {
+  background: color-mix(in srgb, var(--entry) 96%, transparent);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+/* =========================================================
+   4. 站内编辑器
+   ========================================================= */
+
+#blog-editor {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: none;
+  flex-direction: column;
+  background: var(--theme);
+}
+#blog-editor.is-open { display: flex; }
+
+.be-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--entry);
+  flex: none;
+}
+.be-title {
+  font-size: 13.5px;
+  color: var(--secondary);
+  margin-right: auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 40vw;
+}
+.be-status { font-size: 12.5px; color: var(--secondary); margin-right: 4px; }
+.be-status.is-ok { color: #2e9e5b; }
+.be-status.is-warn { color: #c9821a; }
+
+.be-body {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+}
+#be-textarea {
+  flex: 1;
+  width: 100%;
+  border: 0;
+  outline: 0;
+  resize: none;
+  padding: 18px 22px 40px;
+  font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+  font-size: 14px;
+  line-height: 1.75;
+  tab-size: 2;
+  color: var(--content);
+  background: var(--theme);
+}
+/* 右侧：原文对照（只读）
+   刻意不做 Markdown 实时预览 —— 自己写个半吊子渲染器会给出错误的排版暗示，
+   不如直接显示原文，改了哪里一眼能对出来。 */
+.be-orig {
+  flex: 1;
+  overflow-y: auto;
+  padding: 18px 22px 40px;
+  border-left: 1px solid var(--border);
+  background: var(--entry);
+  font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+  font-size: 12.5px;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: var(--secondary);
+}
+.be-orig::before {
+  content: "原文（只读）";
+  display: block;
+  font-family: inherit;
+  font-size: 11px;
+  letter-spacing: .08em;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+  opacity: .8;
+}
+.be-orig:empty { display: none; }
+
+@media screen and (max-width: 768px) {
+  .be-orig { display: none; }
+  .be-title { max-width: 100%; }
+}
+
+/* 编辑模式下隐藏正文（避免和编辑器重叠） */
+html[data-editing] body > .header,
+html[data-editing] body > .main,
+html[data-editing] body > .footer { visibility: hidden; }
+
+/* 文章页出现「编辑本文」入口 */
+.be-entry {
+  display: none;
+  margin-top: 18px;
+}
+html[data-creation][data-post] .be-entry { display: block; }
+
+/* =========================================================
+   5. 尊重「减少动效」
+   ========================================================= */
+@media screen and (max-width: 768px) {
+  /* 手机上抽屉基本占满屏，按钮让位隐藏，用抽屉里的「×」关 */
+  #creation-fab.is-open { opacity: 0; pointer-events: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #creation-fab,
+  #creation-panel,
+  .nav-search input,
+  .nav-search-results,
+  body::before { transition: none !important; animation: none !important; }
+  #creation-panel > * { opacity: 1; transform: none; }
+}

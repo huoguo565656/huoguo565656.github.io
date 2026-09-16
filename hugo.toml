@@ -24,6 +24,15 @@ buildExpired = false
 [params]
   env             = "production"
   defaultTheme    = "auto"          # 跟随系统；读者可点导航栏切换明暗
+
+  # ---- 站内编辑器跳转 GitHub 用 ----
+  # 在文章页进入「创造模式」后，点「去 GitHub 发布」会打开
+  #   https://github.com/<repo>/edit/<repoBranch>/content/<源文件路径>
+  # 在网页上改完提交，Actions 会自动重建站点。这是纯静态站最省事的发布路径：
+  # 不需要在浏览器里放任何凭据。
+  repo            = "huoguo565656/huoguo565656.github.io"
+  repoBranch      = "main"
+
   # 日期格式。不设的话用主题默认的 :date_long，中文站会渲染成 "September 15, 2026"
   DateFormat      = "2006 年 1 月 2 日"
   ShowReadingTime = true
@@ -121,4 +130,18 @@ buildExpired = false
 # 首页额外输出 JSON，给站内搜索用（content/search.md 依赖它）
 # PaperMod 的搜索读的就是根目录的 index.json，不用自定义 output format
 [outputs]
-  home = ["HTML", "RSS", "JSON"]
+  home    = ["HTML", "RSS", "JSON"]
+  # 每篇文章额外输出一份原始 Markdown（/posts/<slug>/index.md）
+  # 用途：站内编辑器要读原文。见下方 outputFormats.Raw 与 layouts/_default/raw.md
+  page    = ["HTML", "Raw"]
+
+# 原始 Markdown 输出格式。
+# 由 layouts/_default/raw.md 用 os.ReadFile 读出源文件**逐字节**原样输出，
+# 所以连 frontmatter 都在——站内编辑时能改标题和标签，不只是正文。
+# notAlternative 是为了不生成 <link rel="alternate">（那会让它被当成订阅源）。
+[outputFormats.Raw]
+  mediaType      = "text/markdown"
+  baseName       = "index"
+  isPlainText    = true
+  isHTML         = false
+  notAlternative = true
